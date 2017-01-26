@@ -65,15 +65,19 @@ im2_dots.view('i8,i8').sort(axis=0)
 # Calculate homography using the dots. We're using RANSAC since it seems to give the best answer
 warp_matrix, status = cv2.findHomography(im2_dots, im1_dots, cv2.RANSAC)
 #warp_matrix, status = cv2.findHomography(im2_dots, im1_dots, cv2.LMEDS)
-print "Percentage of inliers: %f" %(np.sum(status)/numdots*100)
+percent_inliers = np.sum(status)/numdots
+print "Percentage of inliers: %f" %(percent_inliers*100)
 
 # Then line up im2 with im1
 sz = im1.shape
 im2_aligned = cv2.warpPerspective (im2, warp_matrix, (sz[1],sz[0]))
 
 # Output final image
-if args["output"]:
-  cv2.imwrite(args["output"],im2_aligned)
+if (percent_inliers > 0.5):
+  if args["output"]:
+    cv2.imwrite(args["output"],im2_aligned)
+else:
+  print "ERROR: More than 50% outliers. Cannot match images"
 
 # For troubleshooting, you can show the masks and make sure the dots are where you expect
 if args["troubleshooting"]:
