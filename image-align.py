@@ -75,6 +75,7 @@ im2_aligned = cv2.warpPerspective (im2, warp_matrix, (sz[1],sz[0]))
 # Output final image
 if (percent_inliers > 0.5):
   if args["output"]:
+    print "Outputting aligned image as %s" %args["output"]
     cv2.imwrite(args["output"],im2_aligned)
 else:
   print "ERROR: More than 50% outliers. Cannot match images"
