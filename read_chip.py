@@ -8,11 +8,14 @@
 import cv2
 import argparse
 import numpy as np
+import json
+from pprint import pprint
 
 # Parse command line arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", help = "Image to be aligned", required=True)
 ap.add_argument("-o", "--output", help = "Output csv file name", required=True)
+ap.add_argument("-c", "--config", help = "Input JSON config file", required=True)
 ap.add_argument("-a", "--alignmentblur", type = int, default=7, 
 	help = "Radius of Gaussian blur for alignment; must be odd.\nMore blur allows for better noise filtering but worse alignment. Default is 7.")
 ap.add_argument("-d", "--dotsize", type = int, default=6, 
@@ -29,6 +32,7 @@ alignmentblur = args["alignmentblur"]
 dotsize = args["dotsize"]
 numdots = args["numdots"]
 output_file = open(args["output"],'w')
+config_file = open(args["config"],'r')
 
 print "Image size is %d x %d" %(im1.shape[1],im1.shape[0])
 
@@ -61,18 +65,9 @@ im1_dots_sorted = np.concatenate((im1_lower_sorted, im1_upper_sorted))
 # From the layout.xls file:
 # Alignment dots in the matrix are in the first row at 1,4,7,10,13,18
 # In the 17th row at 1,4,7,14,16,18
-ref_alignment_dots_18x17 = np.array([[18,1],
-                                     [13,1],
-                                     [10,1],
-                                     [7,1],
-                                     [4,1],
-                                     [1,1],
-                                     [18,17],
-                                     [16,17],
-                                     [14,17],
-                                     [7,17],
-                                     [4,17],
-                                     [1,17]])
+config_contents = json.load(config_file)
+pprint(config_contents["ref_dots"])
+ref_alignment_dots_18x17 = np.array(config_contents["ref_dots"])
 
 # First of all, the images are mirrored on the X-axis, so need to subtract X from 18
 ref_alignment_dots_mirrored = ref_alignment_dots_18x17.copy()
