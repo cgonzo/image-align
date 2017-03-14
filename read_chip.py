@@ -99,6 +99,9 @@ im1_dots_sorted = np.concatenate((im1_lower_sorted, im1_upper_sorted))
 # Calculate homography using the image and alignment dots. 
 # We're using RANSAC since it seems to give the best answer
 warp_matrix, status = cv2.findHomography(im1_dots_sorted, ref_alignment_dots_scaled, cv2.RANSAC)
+if args["troubleshooting"]:
+  print "findHomography status array:"
+  pprint(status)
 percent_inliers = np.sum(status)/numdots
 print "Percentage of inliers: %f" %(percent_inliers*100)
 
