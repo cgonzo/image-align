@@ -37,8 +37,6 @@ if args["troubleshooting"]:
   print "alignmentblur: %f" %(alignmentblur)
   print "dotsize: %f" %(dotsize)
   print "numdots: %f" %(numdots)
-  print "output_file: %f" %(output_file)
-  print "config_file: %f" %(config_file)
 
 # Print info about the image we are given
 xsize = im1.shape[1]
