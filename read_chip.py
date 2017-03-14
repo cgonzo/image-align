@@ -135,9 +135,9 @@ brightness = np.zeros((max_x-min_x,max_y-min_y))
 # We actually use the areas to the left and right of the array as references, so x is -1..19 rather than 1..18
 # for y it's even stranger; we only care about rows 7-16 (not the top 5 rows)
 print >>output_file, "Row,Column,Brightness"
-for y in range(min_y,max_y):
+for y in range(min_y,max_y+1):
   measurement_point_y = (y + padding) * scaling
-  for x in range(min_x,max_x):
+  for x in range(min_x,max_x+1):
     measurement_point_x = (x + padding) * scaling
     for x_i in range(measurement_point_x - dotsize,measurement_point_x + dotsize):
       for y_i in range(measurement_point_y - dotsize,measurement_point_y + dotsize):
