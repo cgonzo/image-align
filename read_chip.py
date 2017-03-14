@@ -20,7 +20,7 @@ ap.add_argument("-a", "--alignmentblur", type = int, default=7,
 	help = "Radius of Gaussian blur for alignment; must be odd.\nMore blur allows for better noise filtering but worse alignment. Default is 7.")
 ap.add_argument("-d", "--dotsize", type = int, default=6, 
 	help = "Radius of alignment dots.\n This is used to mask off already-found alignment dots and calculate average circl brightness ")
-ap.add_argument("-s", "--showalignment", help = "Display aligned images on screen", action="store_true")
+ap.add_argument("-m", "--showdots", help = "Display alignment dots on screen", action="store_true")
 ap.add_argument("-t", "--troubleshooting", help = "Troubleshooting mode", action="store_true")
 args = vars(ap.parse_args())
 
@@ -92,6 +92,8 @@ for i in xrange(numdots):
   (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(im1_alignmentblur,mask1)
   im1_dots[i]=maxLoc
   cv2.circle(mask1, maxLoc, dotsize*2, 0, -1)
+if args["showdots"]:
+  cv2.imshow("Alignment dots",mask1)
 # sort im1_dots
 #  We know from the reference dots how these are supposed to be lined up
 #  So what we do is sort the image's dots by y, then use the reference dots to know how many are supposed
