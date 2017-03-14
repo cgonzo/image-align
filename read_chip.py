@@ -73,11 +73,8 @@ assert (ref_min_x + padding) * scaling > 0 , "reference dots less than 0 once sc
 assert (ref_min_y + padding) * scaling > 0 , "reference dots less than 0 once scaled in y direction. Increase padding or scaling"
 assert (ref_max_x + padding) * scaling < xsize, "reference dots out of bounds once scaled in x direction. Reduce padding or scaling"
 assert (ref_max_y + padding) * scaling < ysize, "reference dots out of bounds once scaled in y direction. Reduce padding or scaling"
-# First of all, the images are mirrored on the X-axis, so need to subtract X from ref_max_x
-ref_alignment_dots_mirrored = ref_alignment_dots_sorted.copy()
-ref_alignment_dots_mirrored[:,0] = ref_max_x - ref_alignment_dots_sorted[:,0]
 # Add padding to the left and top. Right now, we use the same padding for both
-ref_alignment_dots_padded = ref_alignment_dots_mirrored + padding
+ref_alignment_dots_padded = ref_alignment_dots_sorted + padding
 # Now scale this to the size of the image
 ref_alignment_dots_scaled = ref_alignment_dots_padded * scaling
 
