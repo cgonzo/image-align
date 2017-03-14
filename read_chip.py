@@ -20,8 +20,6 @@ ap.add_argument("-a", "--alignmentblur", type = int, default=7,
 	help = "Radius of Gaussian blur for alignment; must be odd.\nMore blur allows for better noise filtering but worse alignment. Default is 7.")
 ap.add_argument("-d", "--dotsize", type = int, default=6, 
 	help = "Radius of alignment dots.\n This is used to mask off already-found alignment dots and calculate average circl brightness ")
-ap.add_argument("-n", "--numdots", type = int, default=12, 
-	help = "Number of alignment dots")
 ap.add_argument("-s", "--showalignment", help = "Display aligned images on screen", action="store_true")
 ap.add_argument("-t", "--troubleshooting", help = "Troubleshooting mode", action="store_true")
 args = vars(ap.parse_args())
@@ -29,14 +27,12 @@ args = vars(ap.parse_args())
 # Store arguments in pyton variables
 alignmentblur = args["alignmentblur"]
 dotsize = args["dotsize"]
-numdots = args["numdots"]
 output_file = open(args["output"],'w')
 config_file = open(args["config"],'r')
 im1 =  cv2.imread(args["image"])
 if args["troubleshooting"]:
   print "alignmentblur: %f" %(alignmentblur)
   print "dotsize: %f" %(dotsize)
-  print "numdots: %f" %(numdots)
 
 # Print info about the image we are given
 xsize = im1.shape[1]
@@ -60,8 +56,12 @@ assert (min_x + padding) * scaling > 0 , "sample dots less than 0 once scaled in
 assert (min_y + padding) * scaling > 0 , "sample dots less than 0 once scaled in y direction. Increase padding or scaling"
 assert (max_x + padding) * scaling < xsize, "sample dots out of bounds once scaled in x direction. Reduce padding or scaling"
 assert (max_y + padding) * scaling < ysize, "sample dots out of bounds once scaled in y direction. Reduce padding or scaling"
-# Location of reference dots. [1,1] is top left corner
+# Config file has list containing location of reference dots. Need to convert to numpy array for cv2 to use it
 ref_alignment_dots_raw = np.array(config_contents["ref_dots"])
+# Number of dots is simply the number of (x,y) tuples in this array
+numdots = ref_alignment_dots_raw.shape[0]
+if args["troubleshooting"]:
+  print "Number of alignment dots: %f" %(numdots)
 (ref_max_x,ref_max_y) = np.amax(ref_alignment_dots_raw,axis=0)
 (ref_min_x,ref_min_y) = np.amin(ref_alignment_dots_raw,axis=0)
 #  Make sure that scaling makes sense
