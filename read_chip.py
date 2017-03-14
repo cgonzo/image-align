@@ -108,6 +108,7 @@ if args["troubleshooting"]:
   print "findHomography status array:"
   pprint(status)
   print "Sum of inliers: %f" %(np.sum(status))
+  print "percent_inliers: %f" %(percent_inliers)
 print "Percentage of inliers: %f" %(percent_inliers*100)
 
 # Then line up im1 with alignment dots
