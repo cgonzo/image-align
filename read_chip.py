@@ -64,14 +64,18 @@ if args["troubleshooting"]:
   print "Number of alignment dots: %f" %(numdots)
 (ref_max_x,ref_max_y) = np.amax(ref_alignment_dots_raw,axis=0)
 (ref_min_x,ref_min_y) = np.amin(ref_alignment_dots_raw,axis=0)
+# Now we need to sort the reference dots. We want to sort by y descending and then x ascending
+ref_alignment_dots_order = np.lexsort((-ref_alignment_dots_raw[:,0],ref_alignment_dots_raw[:,1]))
+ref_alignment_dots_sorted = ref_alignment_dots_raw[ref_alignment_dots_order]
+pprint(ref_alignment_dots_sorted)
 #  Make sure that scaling makes sense
 assert (ref_min_x + padding) * scaling > 0 , "reference dots less than 0 once scaled in x direction. Increase padding or scaling"
 assert (ref_min_y + padding) * scaling > 0 , "reference dots less than 0 once scaled in y direction. Increase padding or scaling"
 assert (ref_max_x + padding) * scaling < xsize, "reference dots out of bounds once scaled in x direction. Reduce padding or scaling"
 assert (ref_max_y + padding) * scaling < ysize, "reference dots out of bounds once scaled in y direction. Reduce padding or scaling"
 # First of all, the images are mirrored on the X-axis, so need to subtract X from ref_max_x
-ref_alignment_dots_mirrored = ref_alignment_dots_raw.copy()
-ref_alignment_dots_mirrored[:,0] = ref_max_x - ref_alignment_dots_raw[:,0]
+ref_alignment_dots_mirrored = ref_alignment_dots_sorted.copy()
+ref_alignment_dots_mirrored[:,0] = ref_max_x - ref_alignment_dots_sorted[:,0]
 # Add padding to the left and top. Right now, we use the same padding for both
 ref_alignment_dots_padded = ref_alignment_dots_mirrored + padding
 # Now scale this to the size of the image
@@ -92,13 +96,26 @@ for i in xrange(numdots):
   (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(im1_alignmentblur,mask1)
   im1_dots[i]=maxLoc
   cv2.circle(mask1, maxLoc, dotsize*2, 0, -1)
-# sort im1_dots first by y, then separately sort the upper and lower 6
-im1_dots_sorted = im1_dots[im1_dots[:,1].argsort()]
-im1_upper = im1_dots_sorted[6:]
-im1_upper_sorted = im1_upper[im1_upper[:,0].argsort()]
-im1_lower = im1_dots_sorted[0:6]
-im1_lower_sorted = im1_lower[im1_lower[:,0].argsort()]
-im1_dots_sorted = np.concatenate((im1_lower_sorted, im1_upper_sorted))
+# sort im1_dots
+#  We know from the reference dots how these are supposed to be lined up
+#  So what we do is sort the image's dots by y, then use the reference dots to know how many are supposed
+#  to be in each row. We bin them into these rows and then sort by x.
+im1_dots_sorted_by_y = im1_dots[im1_dots[:,1].argsort()]
+ref_alignment_dots_bins,ref_alignment_dots_bins_counts = np.unique(ref_alignment_dots_scaled[:,1],return_counts=True)
+pprint(ref_alignment_dots_bins_counts)
+lower_limit=0
+im1_dots_sorted=np.empty(shape=[0,2])
+for i in range(0,ref_alignment_dots_bins_counts.size):
+  print i
+  upper_limit = lower_limit + ref_alignment_dots_bins_counts[i]
+  im1_subarray = im1_dots_sorted_by_y[lower_limit:upper_limit]
+  im1_subarray_sorted = im1_subarray[im1_subarray[:,0].argsort()]
+  pprint(im1_subarray_sorted)
+  im1_dots_sorted = np.concatenate((im1_dots_sorted, im1_subarray_sorted))
+  lower_limit = upper_limit
+if args["troubleshooting"]:
+  print "Sorted reference dot array:"
+  pprint(im1_dots_sorted)
 
 # Calculate homography using the image and alignment dots. 
 # We're using RANSAC since it seems to give the best answer
