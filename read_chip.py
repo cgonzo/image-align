@@ -131,7 +131,7 @@ im1_aligned_gray = cv2.cvtColor(im1_aligned,cv2.COLOR_BGR2GRAY)
 
 # Now measure all the points we care about
 dots = im1_aligned.copy()
-brightness = np.zeros((max_x-min_x,max_y-min_y))
+brightness = np.zeros((max_x-min_x+1,max_y-min_y+1))
 # We actually use the areas to the left and right of the array as references, so x is -1..19 rather than 1..18
 # for y it's even stranger; we only care about rows 7-16 (not the top 5 rows)
 print >>output_file, "Row,Column,Brightness"
